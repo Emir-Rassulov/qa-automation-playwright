@@ -1,4 +1,5 @@
 import { test, expect } from '../testFixtures';
+import { faker } from '@faker-js/faker';
 
 test('оформление заказа с одним товаром', async ({
   page,
@@ -22,7 +23,16 @@ test('оформление заказа с одним товаром', async ({
   });
 
   await test.step('Заполняем информацию о покупателе и завершаем заказ', async () => {
-    await checkoutPage.fillInformation('Emir', 'Rassulov', '19000');
+    // ИЗМЕНЕНО: добавили генерацию случайных данных
+    const firstName = faker.person.firstName();
+    const lastName = faker.person.lastName();
+    const zipCode = faker.location.zipCode();
+
+    console.log('Customer:', firstName, lastName, zipCode);
+
+    // ИЗМЕНЕНО: вместо фиксированных данных используем faker
+    await checkoutPage.fillInformation(firstName, lastName, zipCode);
+
     await checkoutPage.clickContinue();
     await checkoutPage.finish();
   });
@@ -56,7 +66,9 @@ test('добавление трёх товаров и проверка сумм�
 
   await test.step('Открываем корзину и собираем цены товаров', async () => {
     await cartPage.openCart();
+
     const priceElements = await inventoryPage.productPrices.all();
+
     const pricesText: string[] = [];
 
     for (const price of priceElements) {
@@ -64,16 +76,30 @@ test('добавление трёх товаров и проверка сумм�
     }
 
     const prices = pricesText.map((price) => Number(price.replace('$', '')));
+
     let total = 0;
+
     for (let i = 0; i < prices.length; i++) {
       total += prices[i];
     }
 
     await test.step('Переходим к оформлению заказа', async () => {
       await cartPage.checkout();
-      await checkoutPage.fillInformation('Emir', 'Rassulov', '19000');
+
+      // ИЗМЕНЕНО: faker вместо фиксированных данных
+
+      const firstName = faker.person.firstName();
+      const lastName = faker.person.lastName();
+      const zipCode = faker.location.zipCode();
+
+      console.log('Customer:', firstName, lastName, zipCode);
+
+      await checkoutPage.fillInformation(firstName, lastName, zipCode);
+
       await checkoutPage.clickContinue();
+
       const subtotalValue = await checkoutPage.getSubtotalValue();
+
       await expect(subtotalValue).toBeCloseTo(total, 2);
     });
   });
@@ -87,18 +113,24 @@ test('добавление отсортированного дешёвого т�
 }) => {
   await test.step('Открываем сайт и логинимся', async () => {
     await page.goto('https://www.saucedemo.com');
+
     await loginPage.login('standard_user', 'secret_sauce');
   });
 
   await test.step('Сортируем товары и добавляем самый дешёвый', async () => {
     await inventoryPage.sortLowToHigh();
-    await inventoryPage.addProduct(0);
-  });
 
-  await test.step('Открываем корзину и проверяем товар', async () => {
+    // Сначала сохраняем название
+    // потом добавляем товар
+
     const cheapestProductName = await inventoryPage.productNames.nth(0).textContent();
+
+    await inventoryPage.addProduct(0);
+
     await cartPage.openCart();
+
     const cartProductName = await inventoryPage.productNames.first().textContent();
+
     expect(cartProductName).toBe(cheapestProductName);
   });
 });
