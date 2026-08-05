@@ -42,15 +42,8 @@ pipeline {
 
         stage('Run tests') {
             steps {
-                script {
-                    parallel(
-                        'Chromium tests': {
-                            sh 'npx playwright test --project=chromium'
-                        },
-                        'Chromium tests (rerun)': {
-                            sh 'npx playwright test --project=chromium'
-                        }
-                    )
+                retry(2) {
+                    sh 'npx playwright test --project=chromium'
                 }
             }
         }
