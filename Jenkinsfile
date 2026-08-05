@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    parameters {
+        choice(name: 'TEST_SUITE', choices: ['smoke', 'regression'], description: 'Which suite to run')
+    }
+
     environment {
         TEST_ENV = 'staging'
     }
@@ -9,22 +13,6 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/Emir-Rassulov/qa-automation-playwright.git'
-            }
-        }
-
-        stage('Show environment') {
-            steps {
-                sh 'echo "Running tests against: $TEST_ENV"'
-                sh 'echo "Build number is: $BUILD_NUMBER"'
-                sh 'echo "Job name is: $JOB_NAME"'
-            }
-        }
-
-        stage('Use a credential') {
-            steps {
-                withCredentials([string(credentialsId: 'demo-api-key', variable: 'API_KEY')]) {
-                    sh 'echo "API key length is: ${#API_KEY} characters (value itself is hidden)"'
-                }
             }
         }
 
@@ -42,7 +30,13 @@ pipeline {
 
         stage('Run tests') {
             steps {
-                    sh 'npx playwright test --project=chromium'
+                script {
+                    if (params.TEST_SUITE == 'smoke') {
+                        sh 'npx playwright test --project=chromium --grep @smoke'
+                    } else {
+                        sh 'npx playwright test --project=chromium'
+                    }
+                }
             }
         }
     }

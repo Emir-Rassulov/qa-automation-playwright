@@ -1,7 +1,7 @@
 import { test, expect } from '../testFixtures';
 import { faker } from '@faker-js/faker';
 
-test('оформление заказа с одним товаром', async ({
+test('оформление заказа с одним товаром @smoke', async ({
   page,
   loginPage,
   inventoryPage,
