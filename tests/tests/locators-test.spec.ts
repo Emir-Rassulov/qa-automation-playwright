@@ -61,7 +61,7 @@ test('добавление трёх товаров и проверка сумм�
   });
 
   await test.step('Проверяем количество товаров в корзине', async () => {
-    await expect(inventoryPage.cartBadge).toHaveText('3');
+    await expect(inventoryPage.cartBadge).toHaveText('99');
   });
 
   await test.step('Открываем корзину и собираем цены товаров', async () => {
@@ -113,7 +113,6 @@ test('добавление отсортированного дешёвого т�
 }) => {
   await test.step('Открываем сайт и логинимся', async () => {
     await page.goto('https://www.saucedemo.com');
-
     await loginPage.login('standard_user', 'secret_sauce');
   });
 
