@@ -1,5 +1,4 @@
 pipeline {
-    // Testing GitHub webhook trigger
     agent any
 
     environment {
@@ -43,7 +42,16 @@ pipeline {
 
         stage('Run tests') {
             steps {
-                sh 'npx playwright test --project=chromium'
+                script {
+                    parallel(
+                        'Chromium tests': {
+                            sh 'npx playwright test --project=chromium'
+                        },
+                        'Chromium tests (rerun)': {
+                            sh 'npx playwright test --project=chromium'
+                        }
+                    )
+                }
             }
         }
     }
