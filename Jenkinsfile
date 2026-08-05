@@ -42,9 +42,7 @@ pipeline {
 
         stage('Run tests') {
             steps {
-                retry(2) {
                     sh 'npx playwright test --project=chromium'
-                }
             }
         }
     }

@@ -61,7 +61,7 @@ test('добавление трёх товаров и проверка сумм�
   });
 
   await test.step('Проверяем количество товаров в корзине', async () => {
-    await expect(inventoryPage.cartBadge).toHaveText('99');
+    await expect(inventoryPage.cartBadge).toHaveText('3');
   });
 
   await test.step('Открываем корзину и собираем цены товаров', async () => {
